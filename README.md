@@ -1,6 +1,6 @@
-# Alt School Africa Second Semester Examination
+# Alt School Africa Second Semester Examination project
 
-This project is an Alt School Africa , software engineering program second semester asignment
+This project is an Alt School Africa , software engineering second semester examination project
 
 ## Getting Started
 
