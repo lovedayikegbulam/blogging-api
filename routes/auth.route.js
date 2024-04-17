@@ -3,14 +3,14 @@ import * as authController from "../controllers/auth.controller.js";
 import { validationMiddleWare } from "../middlewares/route.middleware.js";
 import { registerSchema, loginSchema } from "../validations/auth.validation.js";
 
-const userRouter = Router();
+const UserRouter = Router();
 
-userRouter.post(
+UserRouter.post(
   "/register",
   validationMiddleWare(registerSchema),
   authController.registerUser
 );
-userRouter.post(
+UserRouter.post(
   "/login",
   validationMiddleWare(loginSchema),
   authController.loginUser
