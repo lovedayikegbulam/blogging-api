@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import CONFIG from "./config/config.js";
 import connectToDb from "./database/connection.js";
 
@@ -9,6 +10,7 @@ const PORT = CONFIG.PORT || 3000;
 connectToDb();
 
 // Middleware
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
