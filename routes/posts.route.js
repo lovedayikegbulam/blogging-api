@@ -7,6 +7,8 @@ import postSchema from "../validations/post.validation.js";
 const PostRouter = Router();
 
 PostRouter.get("/all", postController.getAllPosts);
+PostRouter.get("/:postId", postController.getPostById);
+
 PostRouter.post(
   "/create",
   validationMiddleWare(postSchema),

@@ -76,11 +76,21 @@ export const getAllPosts = async (limit, page, order, orderBy) => {
 };
 
 export const getPostById = async (postId) => {
-  const post = await Post.findById(postId).populate("user");
-  if (!post) {
-    throw new ErrorWithStatus("Post not found", 404);
+  try {
+    const post = await Post.findById(postId).where("state").eq("published");
+    return post;
+  } catch (err) {
+    throw err;
   }
-  return post;
+};
+
+export const incrementReadCount = async (post) => {
+  try {
+    post.readCount += 1;
+    await post.save();
+  } catch (err) {
+    throw err;
+  }
 };
 
 export const deletePost = async (postId, userId) => {

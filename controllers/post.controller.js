@@ -4,7 +4,6 @@ import { ErrorWithStatus } from "../exceptions/error-with-status.exception.js";
 
 export const createPost = async (req, res) => {
   try {
-
     const post = await postService.createPost(req.user, req.body);
 
     res.status(201).json({
@@ -44,7 +43,7 @@ export const updatePost = async (req, res) => {
 export const getAllPosts = async (req, res) => {
   try {
     // Parse query parameters
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit) || 20;
     const page = parseInt(req.query.page) || 1;
     const order = req.query.order || "desc";
     const orderBy = req.query.orderBy || "createdAt";
@@ -63,19 +62,32 @@ export const getAllPosts = async (req, res) => {
 
 export const getPostById = async (req, res) => {
   try {
-    const { postId } = req.params;
-    const post = await postService.getPostById(postId);
-    res.json({ message: "Post", data: post });
-  } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Error fetching post", error: error.message });
+    const post = await postService.getPostById(req.params.postId);
+
+    if (!post) {
+      return res.status(404).json({
+        status: "Failed",
+        message: "Post with given Id not found",
+      });
+    }
+
+    await postService.incrementReadCount(post);
+
+    res.status(200).json({
+      status: "success",
+      post,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+    });
   }
 };
 
 export const deletePost = async (req, res) => {
   try {
-    
     const post = await postService.deletePost(req.params.postId, req.user._id);
 
     res.status(200).json({
