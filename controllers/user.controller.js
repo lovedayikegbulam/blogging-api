@@ -9,3 +9,4 @@ export const getUserById = async (req, res) => {
         res.status(404).json({ message: 'User not found', error: error.message });
     }
 };
+

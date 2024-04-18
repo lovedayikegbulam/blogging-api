@@ -1,10 +1,40 @@
 // services/postService.js
 import Post from "../database/schema/post.schema.js";
+import * as userService from "../services/user.service.js";
 import { ErrorWithStatus } from "../exceptions/error-with-status.exception.js";
 
-export const createPost = async (title, body, userId) => {
-  const newPost = new Post({ title, body, user: userId });
-  return await newPost.save();
+
+
+export const createPost = async (userData, postData) => {
+  const { title, description, tags, body } = postData;
+
+  // Calculate read time of post from the body passed in
+  const wpm = 225; // wpm => word per minute
+  const numberOfWords = body.trim().split(/\s+/).length;
+  const readTime = Math.ceil(numberOfWords / wpm);
+
+  // Get author name and author Id
+  const { firstname, lastname } = userData;
+  const author = `${firstname} ${lastname}`;
+  const authorId = userData._id;
+
+  // Create the post
+  const post = await Post.create({
+    title,
+    description,
+    tags,
+    body,
+    author,
+    authorId,
+    readTime,
+  });
+
+  // Add the new created post to 'posts' array property on the user document
+  let user = await userService.getUserById(userData._id);
+  user.posts.push(post._id);
+  await user.save(); // Save changes made to the user doc
+
+  return post;
 };
 
 export const updatePost = async (postId, title, body, userId) => {

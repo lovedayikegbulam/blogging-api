@@ -2,10 +2,10 @@ import * as postService from "../services/post.service.js";
 import * as userService from "../services/user.service.js";
 import { ErrorWithStatus } from "../exceptions/error-with-status.exception.js";
 
+
 export const createPost = async (req, res) => {
   try {
-    const { title, body } = req.body;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     // Fetch user details from the database
     const user = await userService.getUserById(userId);
@@ -15,20 +15,14 @@ export const createPost = async (req, res) => {
       throw new ErrorWithStatus("User not found", 401);
     }
 
-    // Create post with the user's ObjectId
-    let newPost = await postService.createPost(title, body, user.id);
+    const post = await postService.createPost(req.user, req.body);
 
-    // Populate the user field in the newPost object
-    newPost = await newPost.populate("user");
-
-    // Send response with the entire user object included
-    res
-      .status(201)
-      .json({ message: "Post created successfully", data: newPost });
+    res.status(201).json({
+      status: "success",
+      post,
+    });
   } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Post creation failed", error: error.message });
+    res.status(400).json({ status: "error", error: error.message });
   }
 };
 
