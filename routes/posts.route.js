@@ -13,5 +13,11 @@ PostRouter.post(
   authMiddleware,
   postController.createPost
 );
+PostRouter.put(
+  "/:postId",
+  authMiddleware,
+  postController.updatePost
+);
+PostRouter.delete("/:postId", authMiddleware, postController.deletePost);
 
 export default PostRouter;

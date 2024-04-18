@@ -2,18 +2,8 @@ import * as postService from "../services/post.service.js";
 import * as userService from "../services/user.service.js";
 import { ErrorWithStatus } from "../exceptions/error-with-status.exception.js";
 
-
 export const createPost = async (req, res) => {
   try {
-    const userId = req.user._id;
-
-    // Fetch user details from the database
-    const user = await userService.getUserById(userId);
-
-    // Check if user exists
-    if (!user) {
-      throw new ErrorWithStatus("User not found", 401);
-    }
 
     const post = await postService.createPost(req.user, req.body);
 
@@ -28,29 +18,26 @@ export const createPost = async (req, res) => {
 
 export const updatePost = async (req, res) => {
   try {
-    const postId = req.query.postId;
-    const { title, body } = req.body;
-    const userId = req.user.id;
+    const post = await postService.updatePost(req.params.postId, req.body);
 
-    // Fetch user details from the database
-    const user = await userService.getUserById(userId);
+    // Check if post belongs to the user initiating the request
+    if (post.authorId.toString() !== req.user._id) {
+      return res.status(401).json({
+        status: "Fail",
+        message: "You can only update a post you created!",
+      });
+    }
 
-    // Fetch the post to check if the user is the owner
-    const post = await postService.getPostById(postId);
-
-    // Check if the user is the owner of the post in post service
-
-    // Update the post
-    let updatedPost = await postService.updatePost(postId, title, body, userId);
-
-    // Populate user details in the updated post
-    updatedPost = await updatedPost.populate("user");
-
-    res.json({ message: "Post updated successfully", data: updatedPost });
-  } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Post update failed", error: error.message });
+    res.status(200).json({
+      status: "success",
+      post,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+    });
   }
 };
 
@@ -88,22 +75,19 @@ export const getPostById = async (req, res) => {
 
 export const deletePost = async (req, res) => {
   try {
-    const { postId } = req.params;
-    const userId = req.user.id;
+    
+    const post = await postService.deletePost(req.params.postId, req.user._id);
 
-    // Fetch user details from the database
-    const user = await userService.getUserById(userId);
-
-    // Check if user exists
-    if (!user) {
-      throw new ErrorWithStatus("User not found", 401);
-    }
-
-    await postService.deletePost(postId, userId);
-    res.json({ message: "Post deleted successfully" });
-  } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Post deletion failed", error: error.message });
+    res.status(200).json({
+      status: "success",
+      message: "Post deleted successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    const status = err.message === "Post with given Id not found" ? 404 : 500;
+    res.status(status).json({
+      status: "error",
+      message: err.message,
+    });
   }
 };

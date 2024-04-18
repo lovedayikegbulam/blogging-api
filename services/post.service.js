@@ -37,21 +37,20 @@ export const createPost = async (userData, postData) => {
   return post;
 };
 
-export const updatePost = async (postId, title, body, userId) => {
-  const post = await Post.findById(postId);
-  if (!post) {
-    throw new ErrorWithStatus("Post not found", 401);
-  }
-  if (post.user.id.toString() !== userId) {
-    throw new ErrorWithStatus(
-      "You are not authorized to update this post",
-      403
+export const updatePost = async (postId, postData) => {
+  const { state, title, description, tags, body } = postData;
+  try {
+    const post = await Post.findByIdAndUpdate(
+      postId,
+      {
+        $set: { state, title, description, tags, body },
+      },
+      { new: true }
     );
+    return post;
+  } catch (err) {
+    throw err;
   }
-  if (title) post.title = title;
-  if (body) post.body = body;
-  post.updatedAt = Date.now();
-  return await post.save();
 };
 
 export const getAllPosts = async (limit, page, order, orderBy) => {
@@ -85,15 +84,20 @@ export const getPostById = async (postId) => {
 };
 
 export const deletePost = async (postId, userId) => {
-  const post = await Post.findById(postId);
-  if (!post) {
-    throw new ErrorWithStatus("Post not found", 404);
+  try {
+    const post = await Post.findOneAndDelete({ _id: postId, authorId: userId });
+
+    if (!post) {
+      throw new Error("Post with given Id not found");
+    }
+
+    // Delete post from 'posts' array in user document
+    const user = await userService.getUserById(userId);
+    user.posts.pull(post._id);
+    await user.save();
+
+    return post;
+  } catch (err) {
+    throw new ErrorWithStatus(`Post deletion failed: ${err.message}`, 400);
   }
-  if (post.user.toString() !== userId) {
-    throw new ErrorWithStatus(
-      "You are not authorized to delete this post",
-      401
-    );
-  }
-  await post.deleteOne();
 };
