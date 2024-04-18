@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 //Define schema
 const PostSchema = new mongoose.Schema(
     {
@@ -40,4 +42,4 @@ const PostSchema = new mongoose.Schema(
 
 // Model
 const Post = mongoose.model("Post", PostSchema);
-export default User;
+export default Post;

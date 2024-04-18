@@ -2,6 +2,9 @@ import express from "express";
 import cors from "cors";
 import CONFIG from "./config/config.js";
 import connectToDb from "./database/connection.js";
+import authRoute from "./routes/auth.route.js";
+import postRoute from "./routes/posts.route.js";
+
 
 const app = express();
 const PORT = CONFIG.PORT || 3000;
@@ -15,11 +18,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
+app.use("/api/auth", authRoute);
+app.use("/api/posts", postRoute);
 
-
-app.get("/", (req, res) => {
-  res.send("Hello from Express!");
-});
 
 // catch all route
 app.all("*", (req, res) => {
