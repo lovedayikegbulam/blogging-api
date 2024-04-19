@@ -3,8 +3,6 @@ import Post from "../database/schema/post.schema.js";
 import * as userService from "../services/user.service.js";
 import { ErrorWithStatus } from "../exceptions/error-with-status.exception.js";
 
-
-
 export const createPost = async (userData, postData) => {
   const { title, description, tags, body } = postData;
 
@@ -53,7 +51,7 @@ export const updatePost = async (postId, postData) => {
   }
 };
 
-export const getAllPosts = async (limit, page, order, orderBy) => {
+export const getAllPosts = async (limit, page, order, orderBy, searchQuery) => {
   try {
     // Calculate skip value based on page and limit
     const skip = (page - 1) * limit;
@@ -62,8 +60,18 @@ export const getAllPosts = async (limit, page, order, orderBy) => {
     const sort = {};
     sort[orderBy] = order === "desc" ? -1 : 1;
 
-    // Fetch paginated posts with sorting
-    const posts = await Post.find()
+    // Build query object for search
+    const search = {};
+    if (searchQuery) {
+      search["$or"] = [
+        { title: { $regex: searchQuery, $options: "i" } }, // Case-insensitive search
+        { author: { $regex: searchQuery, $options: "i" } },
+        { tags: { $regex: searchQuery, $options: "i" } },
+      ];
+    }
+
+    // Fetch paginated posts with sorting and search
+    const posts = await Post.find(search)
       .skip(skip)
       .limit(limit)
       .populate("user")
@@ -71,13 +79,27 @@ export const getAllPosts = async (limit, page, order, orderBy) => {
 
     return posts;
   } catch (error) {
-    throw new ErrorWithStatus(`Error fetching posts: ${error.message}`, 401);
+    throw new Error(`Error fetching posts: ${error.message}`);
   }
 };
 
-export const getPostById = async (postId) => {
+export const getPostById = async (user, postId) => {
   try {
-    const post = await Post.findById(postId).where("state").eq("published");
+    // Await the result of the query to get the actual document
+    let post = await Post.findById(postId);
+
+    if (post) {
+      const { authorId } = post;
+
+      // console.log({ userId: user ? user._id : null, authorId: authorId });
+
+      if (user == null) {
+        post = await Post.findById(postId).where("state").eq("published");
+      } else if (user !== null && authorId.toString() !== user._id) {
+        post = await Post.findById(postId).where("state").eq("published");
+      }
+    }
+
     return post;
   } catch (err) {
     throw err;

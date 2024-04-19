@@ -1,25 +1,15 @@
 import { Router } from "express";
 import * as postController from "../controllers/post.controller.js";
-import { validationMiddleWare } from "../middlewares/route.middleware.js";
-import { authMiddleware } from "../middlewares/auth.middleware.js";
+import { validationMiddleWare as validate } from "../middlewares/route.middleware.js";
+import { authMiddleware as auth, authOrNot } from "../middlewares/auth.middleware.js";
 import postSchema from "../validations/post.validation.js";
 
 const PostRouter = Router();
 
-PostRouter.get("/all", postController.getAllPosts);
-PostRouter.get("/:postId", postController.getPostById);
-
-PostRouter.post(
-  "/create",
-  validationMiddleWare(postSchema),
-  authMiddleware,
-  postController.createPost
-);
-PostRouter.put(
-  "/:postId",
-  authMiddleware,
-  postController.updatePost
-);
-PostRouter.delete("/:postId", authMiddleware, postController.deletePost);
+PostRouter.get("/all", authOrNot, postController.getAllPosts);
+PostRouter.get("/:postId", authOrNot, postController.getPostById);
+PostRouter.post("/create", validate(postSchema), auth , postController.createPost);
+PostRouter.put("/:postId", auth, postController.updatePost);
+PostRouter.delete("/:postId", auth, postController.deletePost);
 
 export default PostRouter;

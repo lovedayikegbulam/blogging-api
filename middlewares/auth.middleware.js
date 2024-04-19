@@ -23,3 +23,30 @@ export const authMiddleware = (req, res, next) => {
     next();
   });
 };
+
+export const authOrNot = (req, res, next) => {
+  // get the Authorization header
+  const authorization = req.headers.authorization;
+  
+  if (!authorization) {
+    // No authorization header, but let the route continue operations
+    next();
+  } else {
+    const bearerToken = authorization.split(" ");
+    if (bearerToken.length !== 2) {
+      // Invalid token format, but let the route continue operations
+      next();
+    } else {
+      Jwt.verify(bearerToken[1], process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+          // Invalid token, but let the route continue operations
+          next();
+        } else {
+          // Token is valid, set decoded user and let the route continue operations
+          req.user = decoded;
+          next();
+        }
+      });
+    }
+  }
+};

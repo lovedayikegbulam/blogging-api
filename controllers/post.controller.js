@@ -47,9 +47,16 @@ export const getAllPosts = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const order = req.query.order || "desc";
     const orderBy = req.query.orderBy || "createdAt";
+    const searchQuery = req.query.search || null;
 
-    // Fetch paginated posts
-    const posts = await postService.getAllPosts(limit, page, order, orderBy);
+    // Fetch paginated, searchable, and orderable posts
+    const posts = await postService.getAllPosts(
+      limit,
+      page,
+      order,
+      orderBy,
+      searchQuery
+    );
 
     // Send response with paginated posts
     res.json({ message: "All posts", data: posts });
@@ -62,7 +69,13 @@ export const getAllPosts = async (req, res) => {
 
 export const getPostById = async (req, res) => {
   try {
-    const post = await postService.getPostById(req.params.postId);
+    let user = null;
+
+    if (req.user) {
+      user = req.user;
+    }
+
+    const post = await postService.getPostById(user, req.params.postId);
 
     if (!post) {
       return res.status(404).json({
