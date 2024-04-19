@@ -51,35 +51,67 @@ export const updatePost = async (postId, postData) => {
   }
 };
 
-export const getAllPosts = async (limit, page, order, orderBy, searchQuery) => {
+export const getAllUserPost = async (ownerId, page, limit, state) => {
   try {
-    // Calculate skip value based on page and limit
-    const skip = (page - 1) * limit;
+    const query = { authorId: ownerId };
 
-    // Build sort object based on orderBy and order
-    const sort = {};
-    sort[orderBy] = order === "desc" ? -1 : 1;
-
-    // Build query object for search
-    const search = {};
-    if (searchQuery) {
-      search["$or"] = [
-        { title: { $regex: searchQuery, $options: "i" } }, // Case-insensitive search
-        { author: { $regex: searchQuery, $options: "i" } },
-        { tags: { $regex: searchQuery, $options: "i" } },
-      ];
+    if (state) {
+      query.state = state;
     }
 
-    // Fetch paginated posts with sorting and search
-    const posts = await Post.find(search)
-      .skip(skip)
-      .limit(limit)
-      .populate("user")
-      .sort(sort);
+    const totalCount = await Post.countDocuments(query);
 
-    return posts;
-  } catch (error) {
-    throw new Error(`Error fetching posts: ${error.message}`);
+    const posts = await Post.find(query)
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    return { totalCount, posts };
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const getAllPublishedPosts = async (
+  page = 1,
+  limit = 20,
+  search = "",
+  sortBy = "timestamp"
+) => {
+  try {
+    let query = { state: "published" };
+
+    // Apply search criteria
+    if (search) {
+      query = {
+        $or: [
+          { title: { $regex: search, $options: "i" } },
+          { author: { $regex: search, $options: "i" } },
+          { tags: { $regex: search, $options: "i" } },
+        ],
+      };
+    }
+
+    // Count total documents for pagination
+    const totalCount = await Post.countDocuments(query);
+
+    // Apply sorting criteria
+    let sortOptions = {};
+    if (
+      sortBy === "readCount" ||
+      sortBy === "readTime" ||
+      sortBy === "timestamp"
+    ) {
+      sortOptions[sortBy] = -1; // Default to ascending order
+    }
+
+    const posts = await Post.find(query)
+      .sort(sortOptions)
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    return { totalCount, posts };
+  } catch (err) {
+    throw err;
   }
 };
 
@@ -100,7 +132,7 @@ export const getPostById = async (user, postId) => {
       }
     }
 
-    return post;
+    return post.populate("authorId");
   } catch (err) {
     throw err;
   }

@@ -1,5 +1,4 @@
 import * as postService from "../services/post.service.js";
-import * as userService from "../services/user.service.js";
 import { ErrorWithStatus } from "../exceptions/error-with-status.exception.js";
 
 export const createPost = async (req, res) => {
@@ -40,30 +39,63 @@ export const updatePost = async (req, res) => {
   }
 };
 
-export const getAllPosts = async (req, res) => {
+export const getAllUserPost = async (req, res) => {
   try {
-    // Parse query parameters
-    const limit = parseInt(req.query.limit) || 20;
+    const ownerId = req.user._id; 
     const page = parseInt(req.query.page) || 1;
-    const order = req.query.order || "desc";
-    const orderBy = req.query.orderBy || "createdAt";
-    const searchQuery = req.query.search || null;
+    const limit = parseInt(req.query.limit) || 20;
+    const state = req.query.state || null;
 
-    // Fetch paginated, searchable, and orderable posts
-    const posts = await postService.getAllPosts(
-      limit,
+    const { totalCount, posts } = await postService.getAllUserPost(
+      ownerId,
       page,
-      order,
-      orderBy,
-      searchQuery
+      limit,
+      state
     );
 
-    // Send response with paginated posts
-    res.json({ message: "All posts", data: posts });
-  } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Error fetching posts", error: error.message });
+    res.status(200).json({
+      status: "success",
+      totalCount,
+      currentPage: page,
+      totalPages: Math.ceil(totalCount / limit),
+      posts,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+    });
+  }
+};
+
+export const getAllPublishedPost = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const search = req.query.search || "";
+    const sortBy = req.query.sortBy || "timestamp";
+
+    const { totalCount, posts } = await postService.getAllPublishedPosts(
+      page,
+      limit,
+      search,
+      sortBy
+    );
+
+    res.status(200).json({
+      status: "success",
+      totalCount,
+      currentPage: page,
+      totalPages: Math.ceil(totalCount / limit),
+      posts,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+    });
   }
 };
 
