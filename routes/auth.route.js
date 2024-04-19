@@ -6,7 +6,7 @@ import { registerSchema, loginSchema } from "../validations/auth.validation.js";
 const authRouter = Router();
 
 authRouter.post(
-  "/register",
+  "/signup",
   validationMiddleWare(registerSchema),
   authController.registerUser
 );
