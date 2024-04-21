@@ -127,7 +127,7 @@ export const getPostById = async (user, postId) => {
 
       if (user == null) {
         post = await Post.findById(postId).where("state").eq("published");
-      } else if (user !== null && authorId.toString() !== user._id) {
+      } else if (user !== null && authorId && authorId.toString() !== user._id) {
         post = await Post.findById(postId).where("state").eq("published");
       }
     }
@@ -165,3 +165,4 @@ export const deletePost = async (postId, userId) => {
     throw new ErrorWithStatus(`Post deletion failed: ${err.message}`, 400);
   }
 };
+
