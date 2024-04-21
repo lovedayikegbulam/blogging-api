@@ -12,8 +12,20 @@ const PORT = CONFIG.PORT || 3000;
 // Connect to Mongodb Database
 connectToDb();
 
+// Allow requests from my domain
+const whitelist = ['https://blogging-api-ur0o.onrender.com'];
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
