@@ -5,6 +5,7 @@ import connectToDb from "./database/connection.js";
 import authRoute from "./routes/auth.route.js";
 import postRoute from "./routes/posts.route.js";
 import data from "./base.route.guide.js";
+import logger from "./logger/logger.winston.js"; 
 
 
 const app = express();
@@ -50,5 +51,5 @@ app.all("*", (req, res) => {
   
   // Start the server
   app.listen(PORT, () => {
-    console.log(`Server running at http://${CONFIG.LOCAL_HOST}:${CONFIG.PORT}/`);
+    logger.info(`Server running at http://${CONFIG.LOCAL_HOST}:${CONFIG.PORT}/`);
   });
