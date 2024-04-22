@@ -7,22 +7,9 @@ const logFormat = printf(({ level, message, timestamp }) => {
 });
 
 const logger = createLogger({
-  // format: combine(timestamp(), logFormat),
-  // transports: [new transports.Console()],
+  format: combine(timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), logFormat),
+  transports: [new transports.Console()],
 });
 
-if (process.env.NODE_ENV !== "production") {
-  logger.add(
-    new transports.Console({
-      format: combine(timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), logFormat),
-    })
-  );
-} else {
-  logger.add(
-    new transports.Console({
-      format: combine(timestamp(), logFormat),
-    })
-  );
-}
 
 export default logger;
