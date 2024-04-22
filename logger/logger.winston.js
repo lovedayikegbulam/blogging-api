@@ -15,6 +15,7 @@ const devLogger = () => {
 
 const prodLogger = () => {
   return createLogger({
+    level: "info",
     format: combine(
       timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
       logFormat
@@ -36,8 +37,8 @@ const prodLogger = () => {
 let logger = null;
 
 
-if(process.env.NODE_ENV === "development"){
-    logger = devLogger;
+if (process.env.NODE_ENV !== 'production') {
+  logger = devLogger;
 }else{
   logger = prodLogger;
 }
