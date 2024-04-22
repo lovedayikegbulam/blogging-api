@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import CONFIG from "../config/config.js";
+import logger from "../logger/logger.winston.js"; 
 
 const connectToDb = async () => {
   const MONGODB_URI = CONFIG.MONGODB_URI;
@@ -7,23 +8,23 @@ const connectToDb = async () => {
   if (MONGODB_URI) {
     try {
       await mongoose.connect(MONGODB_URI);
-      console.log('Connection to DB successful');
+      logger.info('Connection to DB successful');
     } catch (error) {
-      console.error('Connection to DB failed');
-      console.error(error);
+      logger.error('Connection to DB failed');
+      logger.error(error);
     }
   } else {
-    console.error('MongoDB URI is not provided');
+    logger.error('MongoDB URI is not provided');
   }
 
   // Add event listeners
   mongoose.connection.on('connected', () => {
-    console.log('Connection to DB successful');
+    logger.info('Connection to DB successful');
   });
 
   mongoose.connection.on("error", (err) => {
-    console.error('Connection to DB failed');
-    console.error(err);
+    logger.error('Connection to DB failed');
+    logger.error(err);
   });
 };
 
