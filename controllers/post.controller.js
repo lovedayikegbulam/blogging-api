@@ -5,14 +5,14 @@ import logger from "../logger/logger.winston.js";
 export const createPost = async (req, res) => {
   try {
     const post = await postService.createPost(req.user, req.body);
-    logger.info("Post created successfully");
+    // logger.info("Post created successfully");
 
     res.status(201).json({
       status: "success",
       post,
     });
   } catch (error) {
-    logger.error(`Failed to create post: ${error.message}`);
+    // logger.error(`Failed to create post: ${error.message}`);
     res.status(400).json({ status: "error", error: error.message });
   }
 };
@@ -30,13 +30,13 @@ export const updatePost = async (req, res) => {
       });
     }
 
-    logger.info("Post updated successfully");
+    // logger.info("Post updated successfully");
     res.status(200).json({
       status: "success",
       post,
     });
   } catch (err) {
-    logger.error(`Failed to update post: ${err.message}`);
+    // logger.error(`Failed to update post: ${err.message}`);
     res.status(500).json({
       status: "error",
       message: "Internal server error",
@@ -58,7 +58,7 @@ export const getAllUserPost = async (req, res) => {
       state
     );
 
-    logger.info("Retrieved user posts successfully");
+    // logger.info("Retrieved user posts successfully");
     res.status(200).json({
       status: "success",
       totalCount,
@@ -67,7 +67,7 @@ export const getAllUserPost = async (req, res) => {
       posts,
     });
   } catch (err) {
-    logger.error(`Failed to retrieve user posts: ${err.message}`);
+    // logger.error(`Failed to retrieve user posts: ${err.message}`);
     res.status(500).json({
       status: "error",
       message: "Internal server error",
@@ -89,7 +89,7 @@ export const getAllPublishedPost = async (req, res) => {
       sortBy
     );
 
-    logger.info("Retrieved all published posts successfully");
+    // logger.info("Retrieved all published posts successfully");
     res.status(200).json({
       status: "success",
       totalCount,
@@ -98,7 +98,7 @@ export const getAllPublishedPost = async (req, res) => {
       posts,
     });
   } catch (err) {
-    logger.error(`Failed to retrieve published posts: ${err.message}`);
+    // logger.error(`Failed to retrieve published posts: ${err.message}`);
     res.status(500).json({
       status: "error",
       message: "Internal server error",
@@ -126,13 +126,13 @@ export const getPostById = async (req, res) => {
 
     await postService.incrementReadCount(post);
 
-    logger.info("Retrieved post by Id successfully");
+    // logger.info("Retrieved post by Id successfully");
     res.status(200).json({
       status: "success",
       post,
     });
   } catch (err) {
-    logger.error(`Failed to retrieve post by Id: ${err.message}`);
+    // logger.error(`Failed to retrieve post by Id: ${err.message}`);
     res.status(500).json({
       status: "error",
       message: "Internal server error",
@@ -144,14 +144,14 @@ export const deletePost = async (req, res) => {
   try {
     const post = await postService.deletePost(req.params.postId, req.user._id);
 
-    logger.info("Post deleted successfully");
+    // logger.info("Post deleted successfully");
     res.status(200).json({
       status: "success",
       message: "Post deleted successfully",
     });
   } catch (err) {
     const status = err.message === "Post with given Id not found" ? 404 : 500;
-    logger.error(`Failed to delete post: ${err.message}`);
+    // logger.error(`Failed to delete post: ${err.message}`);
     res.status(status).json({
       status: "error",
       message: err.message,
