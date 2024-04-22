@@ -10,7 +10,7 @@ PostRouter.get("/all", postController.getAllPublishedPost);
 PostRouter.get("/posts", auth, postController.getAllUserPost);
 PostRouter.get("/:postId", authOrNot, postController.getPostById);
 PostRouter.post("/create", validate(postSchema), auth , postController.createPost);
-PostRouter.put("/:postId", auth, postController.updatePost);
+PostRouter.patch("/:postId", auth, postController.updatePost);
 PostRouter.delete("/:postId", auth, postController.deletePost);
 
 export default PostRouter;
