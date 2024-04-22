@@ -142,10 +142,28 @@ export const getPostById = async (user, postId) => {
     // Await the result of the query to get the actual document
     let post = await Post.findById(postId);
 
+    if (post == null) {
+      throw new ErrorWithStatus("Post with given id not found", 404);
+    }
+
     if (post) {
       const { authorId } = post;
 
       // console.log({ userId: user ? user._id : null, authorId: authorId });
+
+      if (
+        (post.state == "draft" &&
+          user !== null &&
+          authorId &&
+          authorId.toString() !== user._id) ||
+        (user == null && post.state == "draft")
+      ) {
+        logger.info("Post in draft state can only be accessed by the author");
+        throw new ErrorWithStatus(
+          "Post in draft state can only be accessed by the author",
+          401
+        );
+      }
 
       if (user == null) {
         post = await Post.findById(postId).where("state").eq("published");
@@ -160,7 +178,9 @@ export const getPostById = async (user, postId) => {
 
     logger.info("Retrieved post by Id successfully");
 
-    return post.populate("authorId");
+    post = post.populate("authorId");
+
+    return post;
   } catch (err) {
     logger.error(`Error retrieving post by Id: ${err.message}`);
     throw new ErrorWithStatus(

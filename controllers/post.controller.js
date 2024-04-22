@@ -135,7 +135,7 @@ export const getPostById = async (req, res) => {
     // logger.error(`Failed to retrieve post by Id: ${err.message}`);
     res.status(500).json({
       status: "error",
-      message: "Internal server error",
+      message: err.message
     });
   }
 };

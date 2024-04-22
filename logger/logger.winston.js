@@ -6,9 +6,40 @@ const logFormat = printf(({ level, message, timestamp }) => {
   return `${timestamp} ${level}: ${message}`;
 });
 
-const logger = createLogger({
-  format: combine(timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), logFormat),
-  transports: [new transports.Console()],
-});
+const devLogger = () => {
+  return createLogger({
+    format: combine(timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), logFormat),
+    transports: [new transports.Console()],
+  });
+};
 
-export default logger;
+const prodLogger = () => {
+  return createLogger({
+    format: combine(
+      timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+      logFormat
+    ),
+    transports: [
+      new transports.Console({
+        level: 'info', 
+      }),
+      // new transports.File({
+      //   filename: 'logs/error.log',
+      //   level: 'error', 
+      // }),
+      // new transports.File({ filename: 'logs/combined.log' }),
+    ],
+  });
+};
+
+
+let logger = null;
+
+
+if(process.env.NODE_ENV === "development"){
+    logger = devLogger;
+}else{
+  logger = prodLogger;
+}
+
+export default logger();
