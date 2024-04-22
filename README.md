@@ -30,94 +30,118 @@ Once the server is running, you can interact with the API using HTTP requests. B
 ### Endpoints
 ### Authentication
 
-`POST /signup`
+`POST "/api/auth/signup"`
 
 * Description: Creates a new user account.
 * Request Body:
 
-json
-Copy code
+```
 {
   "firstname": "string",
   "lastname": "string",
   "email": "string",
   "password": "string"
+  "confirmPassword": "string"
 }
-Response: 201 Created
-POST /login
-Description: Logs in an existing user.
-Request Body:
-json
-Copy code
+```
+* Response: 201 Created
+
+`POST "/api/auth/login"`
+
+* Description: Logs in an existing user.
+* Request Body:
+
+```
 {
   "email": "string",
   "password": "string"
 }
-Response: 200 OK
-Blogs
-GET /blogs
-Description: Retrieves a list of published blogs.
-Query Parameters:
-page (optional): Page number for pagination (default: 1)
-limit (optional): Number of blogs per page (default: 20)
-search (optional): Search query for filtering by author, title, or tags
-sortBy (optional): Sorting criteria (e.g., readCount, readingTime, timestamp)
-Response: 200 OK
-GET /blogs/:id
-Description: Retrieves a single published blog by ID.
-Response: 200 OK
-POST /blogs
-Description: Creates a new blog post.
-Request Body:
-json
-Copy code
+```
+* Response: 200 OK
+
+### Blogs
+
+`GET "/api/posts/all"`
+
+* Description: Retrieves a list of published blogs.
+* Query Parameters:
+
+    * page (optional): Page number for pagination (default: 1)
+    * limit (optional): Number of blogs per page (default: 20)
+    * search (optional): Search query for filtering by author, title, or tags
+    * sortBy (optional): Sorting criteria (e.g., readCount, readingTime, timestamp)
+
+* Response: 200 OK
+
+`GET "/api/posts/postId"`
+
+* Description: Retrieves a single published blog by ID.
+* Response: 200 OK
+
+`POST "/api/posts/create"`
+* Description: Creates a new blog post.
+* Request Body:
+
+```
 {
   "title": "string",
   "description": "string",
   "tags": ["string"],
   "body": "string"
 }
-Response: 201 Created
-PUT /blogs/:id
-Description: Updates an existing blog post.
-Request Body:
-json
-Copy code
+```
+* Response: 201 Created
+
+`PATCH "/api/posts/postId"`
+* Description: Updates an existing blog post.
+* Request Body:
+```
 {
   "title": "string",
   "description": "string",
   "tags": ["string"],
   "body": "string"
 }
-Response: 200 OK
-DELETE /blogs/:id
-Description: Deletes an existing blog post.
-Response: 204 No Content
-Users
-GET /users/:id/blogs
-Description: Retrieves a list of blogs created by a specific user.
-Query Parameters:
-page (optional): Page number for pagination (default: 1)
-limit (optional): Number of blogs per page (default: 20)
-state (optional): Filter by blog state (e.g., draft, published)
-Response: 200 OK
-Models
-User
-email: String (required, unique)
-firstname: String (required)
-lastname: String (required)
-password: String (required)
-Blog
-title: String (required, unique)
-description: String
-author: ObjectId (reference to User)
-state: Enum (draft, published)
-readCount: Number
-readingTime: Number
-tags: Array of Strings
-body: String (required)
-timestamp: Date
-Authentication
+```
+* Response: 200 OK
+
+`DELETE "/api/posts/postId"`
+* Description: Deletes an existing blog post.
+* Response: 204 No Content
+
+
+`GET "/api/posts/user"`
+* Description: Retrieves a list of blogs created by a specific user.
+* Query Parameters:
+    * page (optional): Page number for pagination (default: 1)
+    * limit (optional): Number of blogs per page (default: 20)
+    * state (optional): Filter by blog state (e.g., draft, published)
+* Response: 200 OK
+
+## Models
+
+#### User Model
+* firstname: String (required)
+* lastname: String (required)
+* email: String (required, unique)
+* password: String (required)
+* posts: ObjectId (reference to Post)
+* timestamp: Date
+
+
+#### Post Model
+* title: String (required, unique)
+* description: String
+* tags: Array of Strings
+* readCount: Number
+* author: String
+* authorId: ObjectId (reference to User)
+* state: Enum (draft, published)
+* body: String (required)
+* readingTime: Number
+* timestamp: Date
+
+## Authentication
 JWT (JSON Web Tokens) is used for user authentication. Upon successful login, a JWT token is generated and returned to the client, which should be included in subsequent requests for authentication.
 
 ## Logging
