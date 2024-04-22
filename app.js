@@ -4,7 +4,7 @@ import CONFIG from "./config/config.js";
 import connectToDb from "./database/connection.js";
 import authRoute from "./routes/auth.route.js";
 import postRoute from "./routes/posts.route.js";
-import data from "./guide.js";
+import data from "./hd.js";
 
 
 const app = express();
@@ -44,7 +44,7 @@ app.get("", (req, res) => {
 app.all("*", (req, res) => {
     res.status(404);
     res.json({
-      message: "Not found",
+      message: "Page Not found",
     });
   });
   

@@ -2,6 +2,7 @@ const data = {
   "message": "Welcome to the base route",
   "name": "Loveday Ikegbulam",
   "email": "lovedayikegbulam515@gmail.com",
+  "projectName": "Blogging Api",
   "projectRepo": "https://github.com/lovedayikegbulam/blogging-api",
   "Routes": {
     "authRoute": {
@@ -24,7 +25,7 @@ const data = {
       },
       "getAllUserPost": {
         "method": "GET",
-        "url": "https://blogging-api-ur0o.onrender.com/api/posts"
+        "url": "https://blogging-api-ur0o.onrender.com/api/posts/user"
       },
       "getPostById": {
         "method": "GET",

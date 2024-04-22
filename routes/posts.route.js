@@ -7,7 +7,7 @@ import postSchema from "../validations/post.validation.js";
 const PostRouter = Router();
 
 PostRouter.get("/all", postController.getAllPublishedPost);
-PostRouter.get("/posts", auth, postController.getAllUserPost);
+PostRouter.get("/user", auth, postController.getAllUserPost);
 PostRouter.get("/:postId", authOrNot, postController.getPostById);
 PostRouter.post("/create", validate(postSchema), auth , postController.createPost);
 PostRouter.patch("/:postId", auth, postController.updatePost);
