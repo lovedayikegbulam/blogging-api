@@ -265,78 +265,6 @@ describe("getAllPublishedPosts", () => {
   });
 });
 
-// describe('getPostById', () => {
-//   afterEach(() => {
-//     jest.clearAllMocks(); // Clear mocks after each test
-//   });
-
-//   it('should return a published post for a non-authenticated user', async () => {
-//     // Mock the Post model's findById method to return a post
-//     const mockPost = {
-//       _id: 'mockPostId',
-//       title: 'Mock Post',
-//       state: 'published',
-//       authorId: 'mockAuthorId'
-//     };
-//     jest.spyOn(Post, 'findById').mockResolvedValue(mockPost);
-
-//     // Call the getPostById function with a null user (non-authenticated)
-//     const result = await postService.getPostById(null, 'mockPostId');
-
-//     // Expect the result to match the mock post
-//     expect(result).toEqual(mockPost);
-//   });
-
-//   it('should return a published post for an authenticated user who is not the author', async () => {
-//     // Mock the Post model's findById method to return a post
-//     const mockPost = {
-//       _id: 'mockPostId',
-//       title: 'Mock Post',
-//       state: 'published',
-//       authorId: 'mockAuthorId'
-//     };
-//     jest.spyOn(Post, 'findById').mockResolvedValue(mockPost);
-
-//     // Call the getPostById function with an authenticated user who is not the author
-//     const result = await postService.getPostById({ _id: 'mockUserId' }, 'mockPostId');
-
-//     // Expect the result to match the mock post
-//     expect(result).toEqual(mockPost);
-//   });
-
-//   it('should return a post for an authenticated user who is the author', async () => {
-//     // Mock the Post model's findById method to return a post
-//     const mockPost = {
-//       _id: 'mockPostId',
-//       title: 'Mock Post',
-//       state: 'published',
-//       authorId: 'mockUserId' // Same as the user's ID
-//     };
-//     jest.spyOn(Post, "findById").mockReturnValue({
-//       populate: jest.fn().mockReturnThis(),
-//       post: mockPost
-//     });
-
-//     // Call the getPostById function with an authenticated user who is the author
-//     const result = await postService.getPostById({ _id: 'mockUserId' }, 'mockPostId');
-
-//     // Expect the result to match the mock post
-//     expect(result).toEqual({
-//       post: post,
-//       populate: expect.any(Function)
-//     });
-//   });
-
-//   it('should throw an error if an error occurs while fetching the post', async () => {
-//     // Mock the Post model's findById method to throw an error
-//     const errorMessage = 'Error fetching post';
-//     jest.spyOn(Post, 'findById').mockRejectedValue(new Error(errorMessage));
-
-//     // Call the getPostById function and expect it to throw an error
-//     await expect(postService.getPostById({ _id: 'mockUserId' }, 'mockPostId')).rejects.toThrowError(errorMessage);
-//   });
-// });
-
 describe("getPostById", () => {
   afterEach(() => {
     jest.clearAllMocks();
@@ -379,7 +307,7 @@ describe("getPostById", () => {
       authorId: userId,
     });
   });
-  
+
   it("should throw an error if post is not found", async () => {
     // Define test data
     const postId = "invalidId";
