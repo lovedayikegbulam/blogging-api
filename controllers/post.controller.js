@@ -1,5 +1,6 @@
 import * as postService from "../services/post.service.js";
 import { ErrorWithStatus } from "../exceptions/error-with-status.exception.js";
+import logger from "../logger/logger.winston.js"; 
 
 export const createPost = async (req, res) => {
   try {
