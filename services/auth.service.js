@@ -42,7 +42,7 @@ export const login = async (email, password) => {
     },
 
     JWT_SECRET,
-    { expiresIn: "24hr" }
+    { expiresIn: "1hr" }
   );
 
   return { token, user };

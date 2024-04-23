@@ -141,7 +141,7 @@ export const deletePost = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    const status = err.message === "Post with given Id not found" ? 404 : 500;
+    const status = err.message == "Post with given Id not found" ? 404 : 500;
     res.status(status).json({
       status: "error",
       message: err.message,

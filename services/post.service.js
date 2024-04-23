@@ -152,7 +152,7 @@ export const deletePost = async (postId, userId) => {
     const post = await Post.findOneAndDelete({ _id: postId, authorId: userId });
 
     if (!post) {
-      throw new Error("Post with given Id not found");
+      throw new ErrorWithStatus("Post with given Id not found", 404);
     }
 
     // Delete post from 'posts' array in user document
