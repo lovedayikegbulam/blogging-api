@@ -37,7 +37,7 @@ app.use("/api/posts", postRoute);
 
 // Handle the base route
 app.get("", (req, res) => {
-  res.status(404);
+  res.status(200);
   res.json(data);
 });
 
