@@ -3,11 +3,13 @@ import User from "../database/schema/user.schema.js";
 import CONFIG from "../config/config.js";
 import Jwt from "jsonwebtoken";
 import { ErrorWithStatus } from "../exceptions/error-with-status.exception.js";
+import logger from "../logger/logger.winston.js";
 
 export const registerUser = async (firstname, lastname, email, password) => {
   // Check if email exists
   const user = await User.findOne({ email });
   if (user) {
+    logger.error(`User already exists`);
     throw new ErrorWithStatus("User already exists", 400);
   }
 
@@ -25,10 +27,12 @@ export const login = async (email, password) => {
   // Check if email exists
   const user = await User.findOne({ email });
   if (!user) {
+    logger.error(`User not found`);
     throw new ErrorWithStatus("User not found", 404);
   }
   // Check if password is not correct
   if (!bcrypt.compareSync(password, user.password)) {
+    logger.error(`Username or Password is incorrect`);
     throw new ErrorWithStatus("Username or Password is incorrect", 401);
   }
   // Generate access token
@@ -42,7 +46,7 @@ export const login = async (email, password) => {
     },
 
     JWT_SECRET,
-    { expiresIn: "24hr" }
+    { expiresIn: "1hr" }
   );
 
   return { token, user };
