@@ -1,7 +1,8 @@
 # Alt School Africa Second Semester Examination project
 
 ## Backend NodeJS Second Semester Examination Project (Blogging API)
-Description
+
+##### Description
 This project aims to create a robust backend API for a blogging platform using Node.js and MongoDB. The API allows users to sign up, sign in, create, edit, publish, and delete blog posts. It also provides endpoints for fetching published blog posts, filtering, sorting, and paginating them. JWT authentication is used for user authentication, and Winston is integrated for logging purposes.
 
 ### Table of Contents
