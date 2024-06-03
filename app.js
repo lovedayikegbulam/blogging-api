@@ -7,6 +7,7 @@ import authRoute from "./routes/auth.route.js";
 import postRoute from "./routes/posts.route.js";
 import data from "./base.route.guide.js";
 import logger from "./logger/logger.winston.js";
+import redis from './integrations/redis.js';
 
 const app = express();
 const PORT = CONFIG.PORT || 3000;
@@ -47,8 +48,9 @@ app.all("*", (req, res) => {
 });
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  // Connect to Mongodb Database
+  // Connect to databases
   connectToDb();
+  redis.connect();
 
   // Start the server
   app.listen(PORT, () => {

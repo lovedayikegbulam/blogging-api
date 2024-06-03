@@ -3,6 +3,8 @@ import Post from "../database/schema/post.schema.js";
 import * as userService from "../services/user.service.js";
 import { ErrorWithStatus } from "../exceptions/error-with-status.exception.js";
 import logger from "../logger/logger.winston.js";
+import redisClient from '../integrations/redis.js';
+
 
 export const createPost = async (userData, postData) => {
   try {
@@ -87,13 +89,17 @@ export const getAllUserPost = async (ownerId, page, limit, state) => {
   }
 };
 
-export const getAllPublishedPosts = async (
-  page = 1,
-  limit = 20,
-  search = "",
-  sortBy = "timestamp"
-) => {
+export const getAllPublishedPosts = async (page = 1, limit = 20, search = "", sortBy = "timestamp") => {
   try {
+    const cacheKey = `posts:${page}:${limit}:${search}:${sortBy}`;
+
+    // Check if cached data exists
+    const cachedData = await redisClient.get(cacheKey);
+    if (cachedData) {
+      logger.info('returning data from cache')
+      return JSON.parse(cachedData);
+    }
+
     let query = { state: "published" };
 
     // Apply search criteria
@@ -112,28 +118,24 @@ export const getAllPublishedPosts = async (
 
     // Apply sorting criteria
     let sortOptions = {};
-    if (
-      sortBy === "readCount" ||
-      sortBy === "readTime" ||
-      sortBy === "timestamp"
-    ) {
-      sortOptions[sortBy] = -1; // Default to ascending order
+    if (sortBy === "readCount" || sortBy === "readTime" || sortBy === "timestamp") {
+      sortOptions[sortBy] = -1; // Default to descending order
     }
-
+    
+    logger.info('returning data from database')
     const posts = await Post.find(query)
       .sort(sortOptions)
       .skip((page - 1) * limit)
       .limit(limit);
 
-    logger.info("Retrieved published posts successfully");
+    // Cache the data
+    const responseData = { totalCount, posts };
+    await redisClient.set(cacheKey, JSON.stringify(responseData), 'EX', 3600); // Cache for 1 hour
 
-    return { totalCount, posts };
+    return responseData;
   } catch (err) {
     logger.error(`Error retrieving published posts: ${err.message}`);
-    throw new ErrorWithStatus(
-      `Error retrieving published posts: ${err.message}`,
-      500
-    );
+    throw new ErrorWithStatus(`Error retrieving published posts: ${err.message}`, 500);
   }
 };
 
